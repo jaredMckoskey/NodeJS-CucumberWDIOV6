@@ -1,0 +1,282 @@
+{
+  "name": "nodejs-cucumberwdiov5",
+  "version": "1.0.6",
+  "description": "NodeJS Cucumber Framework with WebDriverIO V6 for Automation Testing.",
+  "author": "Jared Mckoskey <jmckoskey@tapqa.com>",
+  "license": "UNLICENSED",
+  "keywords": [
+    "Selenium",
+    "WDIO",
+    "WebDriverIOV6",
+    "Cucumber",
+    "NodeJS",
+    "Test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "dependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-export-default-from": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/register": "^7.9.0",
+    "@types/cucumber": "^6.0.1",
+    "@wdio/allure-reporter": "^6.1.5",
+    "@wdio/appium-service": "^6.1.0",
+    "@wdio/cli": "^6.1.5",
+    "@wdio/config": "^6.1.2",
+    "@wdio/cucumber-framework": "^6.1.6",
+    "@wdio/dot-reporter": "^6.1.5",
+    "@wdio/junit-reporter": "^6.1.5",
+    "@wdio/local-runner": "^6.1.6",
+    "@wdio/logger": "^6.0.16",
+    "@wdio/reporter": "^6.1.5",
+    "@wdio/sauce-service": "^6.1.0",
+    "@wdio/selenium-standalone-service": "^6.0.16",
+    "@wdio/spec-reporter": "^6.1.5",
+    "@wdio/sync": "^6.1.5",
+    "@wdio/utils": "^6.1.0",
+    "allure-commandline": "^2.13.0",
+    "appium": "^1.17.0",
+    "appium-doctor": "^1.15.1",
+    "axe-core": "^3.5.3",
+    "better-npm-run": "^0.1.1",
+    "chai": "^4.2.0",
+    "chalk": "^3.0.0",
+    "crypto": "^1.0.1",
+    "cucumber": "^6.0.5",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-wdio": "^5.13.2",
+    "glob": "^7.1.6",
+    "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
+    "object-assign": "^4.1.1",
+    "oracledb": "^4.2.0",
+    "shelljs": "^0.8.4",
+    "wdio-image-comparison-service": "^1.13.1",
+    "webdriver-manager": "^12.1.7"
+  },
+  "scripts": {
+    "allure": "allure open",
+    "allureGenerate": "bnr allureGenerate",
+    "updateDrivers": "webdriver-manager update",
+    "headlessChrome": "bnr headlessChrome -s",
+    "chrome": "bnr chrome -s",
+    "firefox": "bnr firefox -s",
+    "edge": "bnr edge -s",
+    "ie11": "bnr ie11 -s",
+    "safari": "bnr safari -s",
+    "multiDesktop": "bnr multiDesktop -s",
+    "androidEmulatorLocal": "bnr androidEmulatorLocal -s",
+    "iPadSimulatorLocal": "bnr iPadSimulatorLocal -s",
+    "saucyChrome": "bnr saucyChrome -s",
+    "saucyFirefox": "bnr saucyFirefox -s",
+    "saucyEdge": "bnr saucyEdge -s",
+    "saucyIE11": "bnr saucyIE11 -s",
+    "saucySafari": "bnr saucySafari -s",
+    "multiRemoteDesktop": "bnr multiRemoteDesktop -s",
+    "androidEmulator": "bnr androidEmulator -s",
+    "androidTabEmulator": "bnr androidTabEmulator -s",
+    "iPhoneSimulator": "bnr iPhoneSimulator -s",
+    "iPhone11ProMaxSimulator": "bnr iPhone11ProMaxSimulator -s",
+    "iPadSimulator": "bnr iPadSimulator -s",
+    "jenkinsLV": "bnr jenkinsLV -s",
+    "jenkinsSV": "bnr jenkinsSV -s"
+  },
+  "betterScripts": {
+    "allureGenerate": {
+      "command": "cp -r allure-report/history ./allure-results && allure generate ./allure-results --clean",
+      "description": "Copy History and Generate Report"
+    },
+    "headlessChrome": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Headless Chrome on local machine",
+      "env": {
+        "CAPABILITY": "headlessChrome",
+        "DRIVER": "local"
+      }
+    },
+    "chrome": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Chrome on local machine",
+      "env": {
+        "CAPABILITY": "chrome",
+        "DRIVER": "local"
+      }
+    },
+    "firefox": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Firefox on local machine",
+      "env": {
+        "CAPABILITY": "firefox",
+        "DRIVER": "local"
+      }
+    },
+    "edge": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Edge on local machine",
+      "env": {
+        "CAPABILITY": "edge",
+        "DRIVER": "local"
+      }
+    },
+    "ie11": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Internet Explorer 11 on local machine",
+      "env": {
+        "CAPABILITY": "ie11",
+        "DRIVER": "local"
+      }
+    },
+    "safari": {
+      "command": "wdio wdio.conf.js --host localhost",
+      "description": "Safari on local machine",
+      "env": {
+        "CAPABILITY": "safari",
+        "DRIVER": "local"
+      }
+    },
+    "multiDesktop": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with multiple browsers",
+      "env": {
+        "CAPABILITY": "multiDesktop",
+        "DRIVER": "local"
+      }
+    },
+    "androidEmulatorLocal": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with Android Emulator with Appium",
+      "env": {
+        "CAPABILITY": "androidEmulatorLocal",
+        "DRIVER": "local"
+      }
+    },
+    "iPadSimulatorLocal": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with iPad Simulator with Appium",
+      "env": {
+        "CAPABILITY": "iPadSimulatorLocal",
+        "DRIVER": "local"
+      }
+    },
+    "saucyChrome": {
+      "command": "wdio wdio.conf.js",
+      "description": "Chrome on Sauce Labs",
+      "env": {
+        "CAPABILITY": "chromeSauceLabs",
+        "DRIVER": "remote"
+      }
+    },
+    "saucyFirefox": {
+      "command": "wdio wdio.conf.js",
+      "description": "Firefox on Sauce Labs",
+      "env": {
+        "CAPABILITY": "firefoxSauceLabs",
+        "DRIVER": "remote"
+      }
+    },
+    "saucyEdge": {
+      "command": "wdio wdio.conf.js",
+      "description": "Edge on Sauce Labs",
+      "env": {
+        "CAPABILITY": "edgeSauceLabs",
+        "DRIVER": "remote"
+      }
+    },
+    "saucyIE11": {
+      "command": "wdio wdio.conf.js",
+      "description": "Internet Explorer 11 on Sauce Labs",
+      "env": {
+        "CAPABILITY": "ie11SauceLabs",
+        "DRIVER": "remote"
+      }
+    },
+    "saucySafari": {
+      "command": "wdio wdio.conf.js",
+      "description": "Safari on Sauce Labs",
+      "env": {
+        "CAPABILITY": "safariSauceLabs",
+        "DRIVER": "remote"
+      }
+    },
+    "multiRemoteDesktop": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with multiple browsers on Sauce Labs",
+      "env": {
+        "CAPABILITY": "multiRemoteDesktop",
+        "DRIVER": "remote"
+      }
+    },
+    "androidEmulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with Android Emulator on Sauce Labs",
+      "env": {
+        "CAPABILITY": "androidEmulator",
+        "DRIVER": "remote"
+      }
+    },
+    "androidTabEmulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with Android Tablet Emulator on Sauce Labs",
+      "env": {
+        "CAPABILITY": "androidTabEmulator",
+        "DRIVER": "remote"
+      }
+    },
+    "iPhoneSimulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with IPhone Simulator on Sauce Labs",
+      "env": {
+        "CAPABILITY": "iPhoneSimulator",
+        "DRIVER": "remote"
+      }
+    },
+    "iPhone11ProMaxSimulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with IPhone 11 Pro Max Simulator on Sauce Labs",
+      "env": {
+        "CAPABILITY": "iPhone11ProMaxSimulator",
+        "DRIVER": "remote"
+      }
+    },
+    "iPadSimulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with IPad Simulator on Sauce Labs",
+      "env": {
+        "CAPABILITY": "iPadSimulator",
+        "DRIVER": "remote"
+      }
+    },
+    "jenkinsLV": {
+      "command": "wdio wdio.conf.js",
+      "description": "Jenkins Testing Capabilities Load - Large View",
+      "env": {
+        "CAPABILITY": "jenkinsLV",
+        "TAG": "@regression",
+        "VIEW": "LV",
+        "TESTENV": "test",
+        "DRIVER": "remote",
+        "PARALLEL": "5",
+        "JENKINS": "enabled"
+      }
+    },
+    "jenkinsSV": {
+      "command": "wdio wdio.conf.js",
+      "description": "Jenkins Testing Capabilities Load - Small View",
+      "env": {
+        "CAPABILITY": "jenkinsSV",
+        "TAG": "@regression",
+        "VIEW": "SV",
+        "TESTENV": "test",
+        "DRIVER": "remote",
+        "PARALLEL": "5",
+        "JENKINS": "enabled"
+      }
+    }
+  }
+}
