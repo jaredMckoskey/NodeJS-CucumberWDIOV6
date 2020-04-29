@@ -14,8 +14,8 @@ A WebDriverIO project that supports web and mobile app test automation. The fram
 Resources
 ---
 - [Git](https://git-scm.com/docs)
-- [WDIO-V5-Config](https://webdriver.io/docs/gettingstarted.html)
-- [WDIO-V5-Docs](https://webdriver.io/docs/api.html)
+- [WDIO-V6-Config](https://webdriver.io/docs/gettingstarted.html)
+- [WDIO-V6-Docs](https://webdriver.io/docs/api.html)
 - [SauceLabs-Docs](https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options)
 - [ImageComparison-Docs](https://github.com/wswebcreation/webdriver-image-comparison/blob/master/docs/OPTIONS.md#compare-options)
 - [AxeCore-Docs](https://www.deque.com/axe/axe-for-web/documentation/)

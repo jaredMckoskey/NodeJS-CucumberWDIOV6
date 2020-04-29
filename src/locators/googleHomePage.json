@@ -1,0 +1,29 @@
+{
+  "url": {
+    "URL": "google.com/"
+  },
+  "title": {
+    "TITLE": "Google"
+  },
+  "trait": {
+    "TRAIT": ""
+  },
+  "hrefs": {
+    "TAP_QA_LINK": "//h3[contains(text(),'tapQA | Software Quality Assurance Testing & Consu')]"
+  },
+  "buttons": {
+    "SEARCH_BUTTON": "/descendant::input[@value='Google Search'][1]",
+    "SEARCH_BUTTON2": "/descendant::input[@value='Google Search'][2]",
+    "IMAGES_BUTTON": "//a[@class='q qs'][contains(text(),'Images')]",
+    "FIRST_IMAGE": "//div[@class='y yf']//div[1]//a[1]//img[1]"
+  },
+  "dropdowns": {},
+  "inputs": {
+    "SEARCH_INPUT": "//input[@title='Search']"
+  },
+  "radio_buttons": {},
+  "checkboxes": {},
+  "special": {
+    "GOOGLE_LOGO": "//img[@id='logo']"
+  }
+}

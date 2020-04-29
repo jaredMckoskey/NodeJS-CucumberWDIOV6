@@ -1,0 +1,49 @@
+{
+  "plugins": [
+    "import",
+    "wdio"
+  ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-process-env": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
+    ],
+    "no-prototype-builtins": [
+      "off"
+    ]
+  },
+  "globals": {
+    "global": true,
+    "process": true,
+    "browser": true,
+    "chai": true
+  }
+}

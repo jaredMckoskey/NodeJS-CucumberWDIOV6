@@ -1,0 +1,5 @@
+{
+  "database": {
+    "CONNECTION_STRING": "URL"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "url": {
+    "URL": "https://www.tapqa.com/"
+  },
+  "title": {
+    "TITLE": ""
+  },
+  "trait": {
+    "TRAIT": ""
+  },
+  "hrefs": {},
+  "buttons": {
+    "ABOUT_BUTTON": "//li[@id='menu-item-3895']//span[@class='menu-text'][contains(text(),'ABOUT')]"
+  },
+  "dropdowns": {},
+  "inputs": {},
+  "radio_buttons": {},
+  "checkboxes": {},
+  "special": {}
+}

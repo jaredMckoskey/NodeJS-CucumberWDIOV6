@@ -126,6 +126,8 @@ let configuration = {
     }
   },
   before: function (capabilities, specs) {
+    global.assert = chai.assert;
+    global.expect = chai.expect;
     global.should = chai.should();
   },
   beforeSuite: function (suite) {
@@ -226,7 +228,7 @@ if (process.env.DRIVER === "remote") {
   configuration.key = process.env.SAUCEKEY;
 } else if (process.env.CAPABILITY === "androidEmulatorLocal" || process.env.CAPABILITY === "iPadSimulatorLocal") {
   configuration.services.push(["appium"]);
-  configuration.port = 4723
+  configuration.port = 4723;
 } else {
   configuration.services.push(["selenium-standalone"]);
 }
@@ -345,7 +347,7 @@ function takeScreenshot(scenarioName) {
     browser.saveScreen(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
       // hideElements: hideElementsArray
-    })
+    });
   } else {
     browser.saveFullPageScreen(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
@@ -359,6 +361,7 @@ function takeScreenshot(scenarioName) {
 function mkDirByPathSync(targetDir, {isRelativeToScript = false} = {}) {
   const sep = path.sep;
   const initDir = path.isAbsolute(targetDir) ? sep : "";
+  // eslint-disable-next-line no-undef
   const baseDir = isRelativeToScript ? __dirname : ".";
 
   targetDir.split(sep).reduce((parentDir, childDir) => {
