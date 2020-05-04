@@ -8,7 +8,8 @@ Given(/^I go to the "(.*?)" page$/, pageName => {
   global.pageContext = Utility.toCamelCase(pageName);
   const url = Utility.getLocator("URL");
   Driver.loadUrl(`https://www.${Constants.getBaseUrl()}${url}`);
-  Driver.waitForAjax();
+  Driver.waitForURL(Constants.getBaseUrl() + url);
+  Driver.waitForPageLoad();
 });
 
 Then(/^I am on the "(.*?)" page$/, pageName => {

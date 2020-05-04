@@ -2,6 +2,10 @@ import { Then } from "cucumber";
 import Driver from "../../../src/utility/driver";
 import Utility from "../../../src/utility/utility";
 
+Then(/^I should see "(.*?)" as the page title$/, (value) => {
+  Driver.shouldHavePageTitle(value);
+});
+
 Then(/^I should see the "(.*?)" on the page$/, (elementName) => {
   const locator = Utility.getLocator(elementName);
   Driver.shouldSeeElement(locator);
@@ -37,12 +41,12 @@ Then(/^I should not see the "(.*?)" in view on the "(.*?)"$/, (elementName, cont
   Driver.shouldNotSeeElement(locator);
 });
 
-Then(/^I should see "(.*?)" element with "(.*?)" text on the page$/, (elementName, text) => {
+Then(/^I should see the "(.*?)" with "(.*?)" text on the page$/, (elementName, text) => {
   const locator = Utility.getLocator(elementName);
   Driver.shouldSeeElementWithTextContent(locator, text);
 });
 
-Then(/^I should see all "(.*?)" elements with "(.*?)" text on the page$/, (elementName, text) => {
+Then(/^I should see all the "(.*?)" with "(.*?)" text on the page$/, (elementName, text) => {
   const locator = Utility.getLocator(elementName);
   Driver.shouldSeeAllElementsWithTextContent(locator, text);
 });

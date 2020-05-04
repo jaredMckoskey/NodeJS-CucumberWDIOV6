@@ -110,26 +110,8 @@ class Driver {
    * @param expected {string} Expected URL.
    */
   waitForURL(expected) {
-    // let timeout = 0;
 
-    browser.waitUntil(() => {
-      return this.getURL().includes(expected);
-    }, {
-      timeout: Constants.getLongWait(),
-      timeoutMsg: `${this.getURL()} did not include ${expected} after waiting ${Constants.getLongWait()} milliseconds`
-    });
-
-    // while (!this.getURL().includes(expected)) {
-    //   try {
-    //     this.getURL().should.contains(expected, `The actual value of ${this.getURL()} did not contain the value of ${expected}`);
-    //   } catch (error) {
-    //     timeout++;
-    //     browser.pause(1000);
-    //   } finally {
-    //     if (timeout >= 30)
-    //       this.getURL().should.contains(expected, `The actual value of ${this.getURL()} did not contain the value of ${expected}`);
-    //   }
-    // }
+    expect(browser).toHaveUrl(expected, { containing: true, wait: Constants.getLongWait() });
   }
 
   /**
@@ -541,6 +523,14 @@ class Driver {
   //<editor-fold defaultstate="collapsed" desc="Assertions">
 
   /**
+   * Asserts page title matches expected title.
+   * @param title {string} Title expected on the page.
+   */
+  shouldHavePageTitle(title) {
+    expect(browser).toHaveTitle(title, { wait: Constants.getShortWait() });
+  }
+
+  /**
    * Waits for the given element to no longer exist on page. Must have existed first before calling function.
    * @param locator {string} Locator of element to wait for.
    */
@@ -549,12 +539,9 @@ class Driver {
       $(locator).waitForExist({ timeout: Constants.getShortWait() }); // Wait for element to exist
     } catch (error) {
       return true;
+    } finally {
+      expect($(locator)).not.toExist({ wait: Constants.getMediumWait() });
     }
-    $(locator).waitForExist({
-      reverse: true,
-      timeout: Constants.getLongWait(),
-      timeoutMsg: `Element still existing after waiting ${Constants.getLongWait()} milliseconds`
-    });
   }
 
   /**
@@ -567,10 +554,7 @@ class Driver {
     } catch (error) {
       return true;
     } finally {
-      $(locator).waitForDisplayed({
-        timeout: Constants.getLongWait(),
-        timeoutMsg: `Element still visible after waiting ${Constants.getLongWait()} milliseconds`
-      });
+      expect($(locator)).not.toBeVisible({ wait: Constants.getMediumWait() });
     }
   }
 
@@ -588,7 +572,7 @@ class Driver {
    * @param locator {string} Locator of element to check is displayed.
    */
   shouldSeeElement(locator) {
-    $(locator).waitForDisplayed({ timeout: Constants.getLongWait() });
+    expect($(locator)).toBeDisplayed({ wait: Constants.getLongWait() });
   }
 
   /**
@@ -597,14 +581,7 @@ class Driver {
    * @param count {number} Expected Count.
    */
   shouldSeeCountOfElements(locator, count) {
-    let elements = $(locator).$$(locator);
-    browser.waitUntil(() => {
-      elements = $(locator).$$(locator);
-      return elements.length === count;
-    }, {
-      timeout: Constants.getLongWait(),
-      timeoutMsg: count.should.equal(elements.length, `Expected to see ${count} of this element, but actually found ${elements.length}`)
-    });
+    expect($(locator).$$(locator)).toBeElementsArrayOfSize(count, { wait: Constants.getLongWait() });
   }
 
   /**
@@ -612,7 +589,7 @@ class Driver {
    * @param locator {string} Locator of element to exist.
    */
   shouldNotSeeElement(locator) {
-    $(locator).waitForDisplayed({ timeout: Constants.getMediumWait(), reverse: true});
+    expect($(locator)).not.toBeDisplayed({ wait: Constants.getMediumWait() });
   }
 
   /**
@@ -622,12 +599,7 @@ class Driver {
    */
   shouldSeeElementWithTextContent(locator, text) {
     $(locator).waitForDisplayed();
-    browser.waitUntil(() => {
-      return $(locator).getText().includes(text);
-    }, {
-      timeout: Constants.getShortWait(),
-      timeoutMsg: $(locator).getText().should.contains(text)
-    });
+    expect($(locator).$$(locator)).toHaveTextContaining(text, { wait: Constants.getMediumWait() });
   }
 
   /**
@@ -636,11 +608,12 @@ class Driver {
    * @param text {string} Expected text from elements.
    */
   shouldSeeAllElementsWithTextContent(locator, text) {
-    let elements = $(locator).$$(locator);
-    elements[0].waitForDisplayed();
-    elements.forEach(element => {
-      if (!element.getText().includes(text)) element.scrollIntoView();
-      element.getText().should.contains(text);
+    $(locator).waitForDisplayed();
+    $(locator).$$(locator).map(element => {
+      if (!element.getText().includes(text)) {
+        element.scrollIntoView();
+        expect(element).toHaveTextContaining(text, { wait: Constants.getMediumWait() });
+      }
     });
   }
 
@@ -651,7 +624,7 @@ class Driver {
    */
   shouldSeeElementWithValue(locator, value) {
     $(locator).waitForExist();
-    $(locator).getAttribute("value").should.contains(value);
+    expect($(locator)).toHaveValueContaining(value, { wait: Constants.getMediumWait() });
   }
 
   /**
@@ -725,10 +698,10 @@ class Driver {
     });
 
     try {
-      assert.isBelow(actual, 0.1, `The image of "${elementName}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
+      assert.isBelow(actual, 1);
     } catch (e) {
       Allure.addImageDiffScreenshots(filePath);
-      assert.isBelow(actual, 0.1, `The image of "${elementName}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
+      assert.isBelow(actual, 1, `The image of "${elementName}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
     }
   }
 
@@ -758,10 +731,10 @@ class Driver {
     });
 
     try {
-      assert.isBelow(actual, 0.1, `The image of "${elementName}" of "${context}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
+      assert.isBelow(actual, 1);
     } catch (e) {
       Allure.addImageDiffScreenshots(filePath);
-      assert.isBelow(actual, 0.1, `The image of "${elementName}" of "${context}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
+      assert.isBelow(actual, 1, `The image of "${elementName}" of "${context}" on "${global.pageContext}" in "${build}" does not match the Baseline`);
     }
   }
 
@@ -782,9 +755,9 @@ class Driver {
     });
 
     try {
-      actual.should.equal(0, `The image of "${pageName}" in "${browserName}" does not match the Baseline`);
+      assert.isBelow(actual, 1);
     } catch (e) {
-      actual.should.equal(0, `The image of "${pageName}" in "${browserName}" does not match the Baseline`);
+      assert.isBelow(actual, 1, `The image of "${pageName}" in "${browserName}" does not match the Baseline`);
     }
   }
 
@@ -810,11 +783,11 @@ class Driver {
     });
 
     try {
-      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" does not match the Baseline`);
+      assert.isBelow(actual, 1);
       Allure.addScreenshot(`${filePath}.png`);
     } catch (e) {
       Allure.addImageDiffScreenshots(filePath);
-      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" does not match the Baseline`);
+      assert.isBelow(actual, 1, `The tabbable image of "${global.pageContext}" does not match the Baseline`);
     }
   }
 
@@ -841,11 +814,11 @@ class Driver {
     });
 
     try {
-      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" named "${value}" does not match the Baseline`);
+      assert.isBelow(actual, 1);
       Allure.addScreenshot(`${filePath}.png`);
     } catch (e) {
       Allure.addImageDiffScreenshots(filePath);
-      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" named "${value}" does not match the Baseline`);
+      assert.isBelow(actual, 1, `The tabbable image of "${global.pageContext}" named "${value}" does not match the Baseline`);
     }
   }
 

@@ -127,7 +127,6 @@ let configuration = {
   },
   before: function (capabilities, specs) {
     global.assert = chai.assert;
-    global.expect = chai.expect;
     global.should = chai.should();
   },
   beforeSuite: function (suite) {
@@ -204,7 +203,7 @@ let configuration = {
     if (passed !== true) {
       if (this.maxInstances === 1 && process.env.JENKINS === "disabled") {
         process.stdout.write(chalk.red(step.step.keyword + step.step.text) + "\n");
-        process.stdout.write(chalk.red(error) + "\n");
+        // process.stdout.write(chalk.red(error) + "\n");
       }
       takeScreenshot(step.scenario.name);
     }

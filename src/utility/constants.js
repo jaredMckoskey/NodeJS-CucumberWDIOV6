@@ -2,17 +2,17 @@
 
 class Constants {
   getLongWait() {
-    if (process.env.DRIVER === "local") return 60000;
+    if (process.env.DRIVER === "local") return 30000;
     else return 120000;
   }
 
   getMediumWait() {
-    if (process.env.DRIVER === "local") return 30000;
+    if (process.env.DRIVER === "local") return 15000;
     else return 60000;
   }
 
   getShortWait() {
-    if (process.env.DRIVER === "local") return 10000;
+    if (process.env.DRIVER === "local") return 5000;
     else return 30000;
   }
 

@@ -5,17 +5,17 @@ import Utility from "../../../src/utility/utility";
 When(/^I enter "(.*?)" into the "(.*?)"$/, (value, elementName) => {
   const locator = Utility.getLocator(elementName);
   switch (value) {
-  case "LOCALUSER":
-    value = process.env.LOCALUSER;
-    break;
-  case "LOCALEMAIL":
-    value = process.env.LOCALEMAIL;
-    break;
-  case "LOCALPASS":
-    value = process.env.LOCALPASS;
-    break;
-  default:
-    break;
+    case "LOCALUSER":
+      value = process.env.LOCALUSER;
+      break;
+    case "LOCALEMAIL":
+      value = process.env.LOCALEMAIL;
+      break;
+    case "LOCALPASS":
+      value = process.env.LOCALPASS;
+      break;
+    default:
+      break;
   }
   Driver.fillElementWithText(locator, value);
 });
