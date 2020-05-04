@@ -80,12 +80,14 @@
     "saucySafari": "bnr saucySafari -s",
     "multiRemoteDesktop": "bnr multiRemoteDesktop -s",
     "androidEmulator": "bnr androidEmulator -s",
+    "googlePixel3Emulator": "bnr googlePixel3Emulator -s",
     "androidTabEmulator": "bnr androidTabEmulator -s",
     "iPhoneSimulator": "bnr iPhoneSimulator -s",
     "iPhone11ProMaxSimulator": "bnr iPhone11ProMaxSimulator -s",
     "iPadSimulator": "bnr iPadSimulator -s",
     "jenkinsLV": "bnr jenkinsLV -s",
-    "jenkinsSV": "bnr jenkinsSV -s"
+    "jenkinsSV": "bnr jenkinsSV -s",
+    "jenkinsA11Y": "bnr jenkinsA11Y -s"
   },
   "betterScripts": {
     "allureGenerate": {
@@ -220,6 +222,14 @@
         "DRIVER": "remote"
       }
     },
+    "googlePixel3Emulator": {
+      "command": "wdio wdio.conf.js",
+      "description": "Testing with Google Pixel 3 on Sauce Labs",
+      "env": {
+        "CAPABILITY": "googlePixel3Emulator",
+        "DRIVER": "remote"
+      }
+    },
     "androidTabEmulator": {
       "command": "wdio wdio.conf.js",
       "description": "Testing with Android Tablet Emulator on Sauce Labs",
@@ -272,6 +282,19 @@
         "CAPABILITY": "jenkinsSV",
         "TAG": "@regression",
         "VIEW": "SV",
+        "TESTENV": "test",
+        "DRIVER": "remote",
+        "PARALLEL": "5",
+        "JENKINS": "enabled"
+      }
+    },
+    "jenkinsA11Y": {
+      "command": "wdio wdio.conf.js",
+      "description": "Jenkins Testing Capabilities Load - Accessibility Testing",
+      "env": {
+        "CAPABILITY": "chromeSauceLabs",
+        "TAG": "@accessibility",
+        "VIEW": "LV",
         "TESTENV": "test",
         "DRIVER": "remote",
         "PARALLEL": "5",

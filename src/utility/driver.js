@@ -17,6 +17,7 @@ import { source } from "axe-core";
 class Driver {
 
   //<editor-fold defaultstate="collapsed" desc="Mobile">
+
   /**
    * Checks if tests are running in mobile capability.
    * @returns {boolean}
@@ -57,6 +58,7 @@ class Driver {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Browser">
+
   /**
    * Browser goes to specified URL.
    * @param url {string} URL to go to.
@@ -271,12 +273,24 @@ class Driver {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Common">
+
   /**
    * Generic Wait function in seconds.
    * @param waitTime {number} Wait time in seconds.
    */
   wait(waitTime) {
     browser.pause(waitTime * 1000);
+  }
+
+  removeScrollLock() {
+    const scrollLock = Utility.getLocatorInContext("SCROLL_LOCK", "header")
+    if ($(scrollLock).isExisting()) {
+      $(scrollLock).$$(scrollLock).forEach(element => {
+        let docElement = `document.evaluate("${scrollLock}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue`
+        browser.execute(`${docElement}.setAttribute("class", ${docElement}.getAttribute("class").replace("scroll-locked", ""));`);
+        assert.isFalse(element.getAttribute("class").includes("scroll-locked"));
+      });
+    }
   }
 
   /**
@@ -304,8 +318,25 @@ class Driver {
     let shotPath = browser.config.screenshotPath
       .split(":")[0]
       .replace(/ /g, "");
-    let fileName = `${global.pageContext}-${process.env.CAPABILITY}-${Date.now()}`;
+    let fileName = `fullPage-${global.pageContext}-${process.env.CAPABILITY}-${Date.now()}`;
     browser.saveFullPageScreen(`${fileName}`,{
+      actualFolder: path.join(process.cwd(), shotPath),
+      hideElements: Utility.getScreenshotHideElements(),
+      hideAfterFirstScroll: Utility.getScreenshotHideAfterFirstScrollElements()
+    });
+    Allure.addScreenshot(`${shotPath}${fileName}.png`);
+  }
+
+  /**
+   * Generic Tabbable Full Page Screenshot function.
+   */
+  takeTabbableFullPageScreenshot() {
+    const path = require("path");
+    let shotPath = browser.config.screenshotPath
+      .split(":")[0]
+      .replace(/ /g, "");
+    let fileName = `tabbableFullPage-${global.pageContext}-${process.env.CAPABILITY}-${Date.now()}`;
+    browser.saveTabbablePage(`${fileName}`,{
       actualFolder: path.join(process.cwd(), shotPath),
       hideElements: Utility.getScreenshotHideElements(),
       hideAfterFirstScroll: Utility.getScreenshotHideAfterFirstScrollElements()
@@ -316,6 +347,7 @@ class Driver {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Click">
+
   /**
    * Clicks element when Displayed, Enabled, Clickable.
    * @param locator {string} Element to be clicked on.
@@ -396,6 +428,7 @@ class Driver {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Keys">
+
   /**
    * Sets value of given element to text.
    * @param locator {string} Element to send text to.
@@ -461,6 +494,7 @@ class Driver {
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Action">
+
   /**
    * Moves browser view to given element.
    * @param locator {string} Element to move into view.
@@ -489,9 +523,23 @@ class Driver {
     $(locator).isDisplayedInViewport();
   }
 
+  scrollLoadPage() {
+    while (browser.execute("if((window.innerHeight+window.scrollY)>=document.body.offsetHeight){return true;}") !== true) {
+      browser.execute(`window.scrollTo({top: document.body.scrollHeight,left: 0,behavior: 'smooth'});`);
+      this.waitForAjax();
+      browser.pause(500);
+    }
+    while (browser.execute(`if((window.innerHeight+window.scrollY)<=${browser.getWindowSize().height}){return true;}`) !== true) {
+      browser.execute(`window.scrollTo({top: 0,left: 0,behavior: 'smooth'});`);
+      this.waitForAjax();
+      browser.pause(500);
+    }
+  }
+
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Assertions">
+
   /**
    * Waits for the given element to no longer exist on page. Must have existed first before calling function.
    * @param locator {string} Locator of element to wait for.
@@ -737,6 +785,67 @@ class Driver {
       actual.should.equal(0, `The image of "${pageName}" in "${browserName}" does not match the Baseline`);
     } catch (e) {
       actual.should.equal(0, `The image of "${pageName}" in "${browserName}" does not match the Baseline`);
+    }
+  }
+
+  /**
+   * Asserts tabbable page image against baseline screenshot.
+   */
+  assertTabbableImage() {
+
+    let build;
+    if (browser.capabilities.hasOwnProperty("build")) {
+      build = build = `${browser.capabilities.build}`;
+    } else build = `${browser.capabilities.browserName}`;
+
+    let filePath = `${process.env.VIEW}/${build}/${global.pageContext}/tabbableScreenshots/tabbableScreenshot`;
+
+    this.removeScrollLock();
+    this.scrollLoadPage();
+
+    const actual = browser.checkTabbablePage(filePath, {
+      scaleImagesToSameSize: true,
+      ignoreAntialiasing: true,
+      ignoreAlpha: true,
+    });
+
+    try {
+      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" does not match the Baseline`);
+      Allure.addScreenshot(`${filePath}.png`);
+    } catch (e) {
+      Allure.addImageDiffScreenshots(filePath);
+      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" does not match the Baseline`);
+    }
+  }
+
+  /**
+   * Asserts named tabbable page image against named baseline screenshot.
+   * @param value {string} Value of the name.
+   */
+  assertNamedTabbableImage(value) {
+
+    let build;
+    if (browser.capabilities.hasOwnProperty("build")) {
+      build = build = `${browser.capabilities.build}`;
+    } else build = `${browser.capabilities.browserName}`;
+
+    let filePath = `${process.env.VIEW}/${build}/${global.pageContext}/tabbableScreenshots/${value}`;
+
+    this.removeScrollLock();
+    this.scrollLoadPage();
+
+    const actual = browser.checkTabbablePage(filePath, {
+      scaleImagesToSameSize: true,
+      ignoreAntialiasing: true,
+      ignoreAlpha: true,
+    });
+
+    try {
+      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" named "${value}" does not match the Baseline`);
+      Allure.addScreenshot(`${filePath}.png`);
+    } catch (e) {
+      Allure.addImageDiffScreenshots(filePath);
+      assert.isBelow(actual, 0.1, `The tabbable image of "${global.pageContext}" named "${value}" does not match the Baseline`);
     }
   }
 

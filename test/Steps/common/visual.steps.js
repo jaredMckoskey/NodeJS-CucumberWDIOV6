@@ -10,6 +10,14 @@ When(/^I take a full page screenshot$/, () => {
   Driver.takeFullPageScreenshot();
 });
 
+Then(/^I check the tabbable image of the page against the baseline image$/, () => {
+  Driver.assertTabbableImage();
+});
+
+Then(/^I check the tabbable image named "(.*?)" of the page against the baseline image$/, (value) => {
+  Driver.assertNamedTabbableImage(value);
+});
+
 Then(/^I check the image of the "(.*?)" on the page against the baseline image$/, (elementName) => {
   const locator = Utility.getLocator(elementName);
   Driver.assertElementImage(locator, elementName);

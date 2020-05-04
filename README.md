@@ -56,16 +56,16 @@ Add the following tools to your environment:
 * 3a. LTS - Install all the required tools and configurations using Microsoft's windows-build-tools using: `npm install --global production windows-build-tools` from an elevated         PowerShell or CMD.exe (run as Administrator). 
 * 3b. CURRENT - Current build of NodeJS will automatically launch and execute `npm install --global production windows-build-tools`
 * Android Studio (optional)
-* 1. If running android emulators, install Android Studio: https://developer.android.com/studio/
+* 1. If running local android emulators, install Android Studio: https://developer.android.com/studio/
 * 2. Create an Android Emulator following: https://developer.android.com/studio/run/managing-avds
-* Chrome Dev Tools (optional) - Necessary to inspect elements elements for UI selectors.
+* Chrome Dev Tools (optional) - Necessary to inspect elements for UI selectors.
 
 Once your tools are configured, download the project and navigate to the root directory. 
 
 * Run: `npm install`
 * If everything built successfully, you're ready to run tests.
 
-@Optional(Edge): If using Edge for testing. enter `DISM.exe /Online /Add-Capability /CapabilityName:Microsoft.WebDriver~~~~0.0.1.0` in an elevated PowerShell window to enable WDM WebDriver.
+@Optional(Edge): If using Edge for testing. enter `DISM.exe /Online /Add-Capability /CapabilityName:Microsoft.WebDriver~~~~0.0.1.0` in an elevated PowerShell Window to enable WDM WebDriver.
 
 Usage
 ---
@@ -83,4 +83,3 @@ Running tests
 * Set Environment Variable and Credentials in the .env file. Call with `process.env.<VARIABLENAME>`.
 * Environment Variable DEMOTIME will add a pause between steps in the test to slow it down for demo purposes. Set "0" to run at normal speed.
 * `npm run <BROWSER>` <BROWSER> can be chrome, firefox, edge, ie11, safari, androidEmulator, iphoneSimulator and others (full list in capabilities.json).
-
