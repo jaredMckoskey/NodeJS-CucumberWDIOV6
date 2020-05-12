@@ -238,7 +238,7 @@ if (configuration.maxInstances > 1 || process.env.JENKINS === "enabled")
       outputDir: "./results/spec",
       stdout: true
     }]);
-if (process.env.JENKINS === "enabled" && !process.env.TAG.includes("@accessibility")) configuration.specFileRetries = 2;
+if (process.env.JENKINS === "enabled" && !process.env.TAG.includes("@accessibility")) configuration.specFileRetries = 1;
 
 function getCapability() {
 
