@@ -59,13 +59,9 @@ class Utility {
     } else throw new Error(`Unable to find locator "${elementNameSnake}" in the "${this.toCamelCase(context)}.json"!`);
   }
 
-  getScreenshotHideElements() {
-    return "";
-  }
+  getScreenshotHideElements() {}
 
-  getScreenshotHideAfterFirstScrollElements() {
-    return "";
-  }
+  getScreenshotHideAfterFirstScrollElements() {}
 
   /**
    * Gets today's date.

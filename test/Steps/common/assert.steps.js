@@ -1,4 +1,4 @@
-import { Then } from "cucumber";
+import {Then} from "cucumber";
 import Driver from "../../../src/utility/driver";
 import Utility from "../../../src/utility/utility";
 
@@ -8,11 +8,6 @@ Then(/^I should see "(.*?)" as the page title$/, (value) => {
 
 Then(/^I should see the "(.*?)" on the page$/, (elementName) => {
   const locator = Utility.getLocator(elementName);
-  Driver.shouldSeeElement(locator);
-});
-
-Then(/^I should see the "(.*?)" on the "(.*?)"$/, (elementName, context) => {
-  const locator = Utility.getLocatorInContext(elementName, context);
   Driver.shouldSeeElement(locator);
 });
 
@@ -64,6 +59,16 @@ Then(/^I scroll the "(.*?)" on the page into view$/, (elementName) => {
 Then(/^I scroll the "(.*?)" on the "(.*?)" into view$/, (elementName, context) => {
   const locator = Utility.getLocatorInContext(elementName, context);
   Driver.scrollToElement(locator);
+});
+
+Then(/^I log the text from the "(.*?)" on the page$/, (elementName) => {
+  const locator = Utility.getLocator(elementName);
+  Driver.logElementText(locator);
+});
+
+Then(/^I should see the "(.*?)" with the logged text on the page$/, (elementName) => {
+  const locator = Utility.getLocator(elementName);
+  Driver.shouldSeeElementWithTextContent(locator, Driver.getLoggedElementText());
 });
 
 Then(/^I log any accessibility errors on the page$/, () => {

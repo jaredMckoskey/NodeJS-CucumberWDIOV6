@@ -48,18 +48,38 @@ exports.addBuild = function (build) {
   allureReporter.addArgument("build", build);
 };
 
+exports.addIssueLink = function (issue) {
+  allureReporter.addTestId(issue);
+};
+
+exports.addUserInformation = function (userIndex, userObject) {
+  allureReporter.addAttachment(`Using Automation User #${userIndex}`, userObject, "text/plain");
+};
+
+exports.addStepInfo = function (description, info) {
+  allureReporter.addAttachment(description, info.toString(), "text/plain");
+};
+
+exports.addStepError = function (description, error) {
+  allureReporter.addAttachment(description, error.toString(), "text/plain");
+};
+
+exports.addAnalyticsEvent = function (metric) {
+  allureReporter.addAttachment("Analytics Event Found.", metric, "text/plain");
+};
+
 exports.addAccessibilityErrors = function (results) {
   results.forEach(result => {
     let resultParsed = `
       <h5>
-      <b>Details:</b> ${result.help.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")} <br>
+      <b>Details:</b> ${result.help.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")} <br>
       <b>Reference:</b> <a href="${result.helpUrl}">${result.helpUrl}</a> <br>
       <b>Severity:</b> ${result.impact.toUpperCase()} <br>
       <b>Nodes:</b> ${result.nodes.map(node => node.target)} <br>
       <h6> ${JSON.stringify(result, null, 4)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")}
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}
       </h6> </h5>
       `;
     allureReporter.addAttachment(result.description, resultParsed, "text/html");

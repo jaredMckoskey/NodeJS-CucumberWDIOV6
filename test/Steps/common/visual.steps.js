@@ -1,4 +1,4 @@
-import { When, Then } from "cucumber";
+import {When, Then} from "cucumber";
 import Driver from "../../../src/utility/driver";
 import Utility from "../../../src/utility/utility";
 

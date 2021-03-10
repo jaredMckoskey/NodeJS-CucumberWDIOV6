@@ -5,7 +5,7 @@ import Constants from "./constants";
 import Utility from "./utility.js";
 import Allure from "./customAllure.js";
 import Chalk from "chalk";
-import { source } from "axe-core";
+import {source} from "axe-core";
 
 /**
  * The Driver is a wrapper around the WebDriverIO 'browser' object.
@@ -68,6 +68,13 @@ class Driver {
   }
 
   /**
+   * Browser refreshes current URL.
+   */
+  refresh() {
+    browser.url(this.getURL());
+  }
+
+  /**
    * Browser returns current active URL.
    * @returns {string} Current URL.
    */
@@ -111,7 +118,7 @@ class Driver {
    */
   waitForURL(expected) {
 
-    expect(browser).toHaveUrl(expected, { containing: true, wait: Constants.getLongWait() });
+    expect(browser).toHaveUrl(expected, {containing: true, wait: Constants.getLongWait()});
   }
 
   /**
@@ -153,7 +160,7 @@ class Driver {
    * Accepts alert with given wait time.
    * @param waitTime {number} Wait time in seconds.
    */
-  acceptAlert(waitTime= 0) {
+  acceptAlert(waitTime = 0) {
     this.wait(waitTime ? waitTime : 1);
     browser.acceptAlert();
   }
@@ -188,6 +195,14 @@ class Driver {
    * Waits until selected Cookie is available.
    * @param cookieName {string} Name of Cookie.
    */
+  checkForCookie(cookieName) {
+    return browser.getCookies([cookieName])[0] !== undefined;
+  }
+
+  /**
+   * Waits until selected Cookie is available.
+   * @param cookieName {string} Name of Cookie.
+   */
   waitForCookie(cookieName) {
     browser.waitUntil(() => {
       return browser.getCookies([cookieName])[0] !== undefined;
@@ -195,6 +210,14 @@ class Driver {
       timeout: Constants.getMediumWait(),
       timeoutMsg: `Cookie not found after waiting ${Constants.getMediumWait()} milliseconds`
     });
+  }
+
+  /**
+   * Injects Cookie into the Environment.
+   * @param cookie {object} object of Cookie.
+   */
+  injectCookie(cookie) {
+    browser.setCookies(cookie);
   }
 
   /**
@@ -221,8 +244,8 @@ class Driver {
    * @returns {string} String of Cookie Object.
    */
   getCookie(cookieName) {
-    let cookieFull = browser.getCookies([cookieName])[0];
-    return `{ "name": "${cookieName}", "value": "${cookieFull.value}" }`;
+    let cookie = browser.getCookies([cookieName])[0];
+    return `{ "name": "${cookieName}", "value": "${cookie.value}" }`;
   }
 
   /**
@@ -232,8 +255,8 @@ class Driver {
    */
   getCookieValue(cookieName) {
     this.waitForCookie(cookieName);
-    let cookieFull = browser.getCookies([cookieName])[0];
-    return cookieFull.value;
+    let cookie = browser.getCookies([cookieName])[0];
+    return cookie.value;
   }
 
   /**
@@ -252,6 +275,13 @@ class Driver {
   getScriptReturn(script) {
     return browser.execute(`return ${script}`).toString();
   }
+
+  getScriptReturnAndLog(script) {
+    if (process.env.SCRIPTLOGGING === "enabled") {
+      global.scriptReturnJson[global.timestamp]["userTimings"] = global.scriptReturnJson[global.timestamp]["userTimings"].concat(browser.execute(`return ${script}`));
+    } else throw new Error("Script Logging is not enabled in the ENV.");
+  }
+
   //</editor-fold>
 
   //<editor-fold defaultstate="collapsed" desc="Common">
@@ -264,11 +294,32 @@ class Driver {
     browser.pause(waitTime * 1000);
   }
 
+  logElementText(locator) {
+    global.loggedText = locator.getText();
+    if (browser.config.maxInstances === 1 && process.env.JENKINS === "disabled") {
+      console.log(`Logged "${global.loggedText}" text from element`);
+    }
+    Allure.addStepInfo("Logged Text from element:", global.loggedText);
+  }
+
+  logElementIndexText(locator, index) {
+    let elements = $(locator).$$(locator);
+    global.loggedText = elements[index].getText();
+    if (browser.config.maxInstances === 1 && process.env.JENKINS === "disabled") {
+      console.log(`Logged "${global.loggedText}" text from element`);
+    }
+    Allure.addStepInfo("Logged Text from element:", global.loggedText);
+  }
+
+  getLoggedElementText() {
+    return global.loggedText;
+  }
+
   removeScrollLock() {
-    const scrollLock = Utility.getLocatorInContext("SCROLL_LOCK", "header")
+    const scrollLock = Utility.getLocatorInContext("SCROLL_LOCK", "header");
     if ($(scrollLock).isExisting()) {
       $(scrollLock).$$(scrollLock).forEach(element => {
-        let docElement = `document.evaluate("${scrollLock}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue`
+        let docElement = `document.evaluate("${scrollLock}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue`;
         browser.execute(`${docElement}.setAttribute("class", ${docElement}.getAttribute("class").replace("scroll-locked", ""));`);
         assert.isFalse(element.getAttribute("class").includes("scroll-locked"));
       });
@@ -301,7 +352,7 @@ class Driver {
       .split(":")[0]
       .replace(/ /g, "");
     let fileName = `fullPage-${global.pageContext}-${process.env.CAPABILITY}-${Date.now()}`;
-    browser.saveFullPageScreen(`${fileName}`,{
+    browser.saveFullPageScreen(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
       hideElements: Utility.getScreenshotHideElements(),
       hideAfterFirstScroll: Utility.getScreenshotHideAfterFirstScrollElements()
@@ -318,7 +369,7 @@ class Driver {
       .split(":")[0]
       .replace(/ /g, "");
     let fileName = `tabbableFullPage-${global.pageContext}-${process.env.CAPABILITY}-${Date.now()}`;
-    browser.saveTabbablePage(`${fileName}`,{
+    browser.saveTabbablePage(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
       hideElements: Utility.getScreenshotHideElements(),
       hideAfterFirstScroll: Utility.getScreenshotHideAfterFirstScrollElements()
@@ -338,8 +389,30 @@ class Driver {
     $(locator).waitForDisplayed();
     $(locator).waitForEnabled();
     $(locator).waitForClickable();
-    $(locator).click();
+    try {
+      $(locator).click();
+    } catch (e) {
+      browser.execute("window.scrollBy(0, 100);").then();
+      $(locator).click();
+    }
   }
+
+  /**
+   * Clicks element when visible.
+   * @param locator {string} Element to be clicked on.
+   */
+  clickWhenVisible(locator) {
+    $(locator).waitForDisplayed();
+    $(locator).waitForEnabled();
+    $(locator).waitForClickable();
+    try {
+      $(locator).click();
+    } catch (e) {
+      browser.execute("window.scrollBy(0, 100);").then();
+      $(locator).click();
+    }
+  }
+
   /**
    * Loops through elements with given locator and clicks the one.
    * that contains matching text.
@@ -484,7 +557,7 @@ class Driver {
    * @param yOffset {number} Vertical offset from element.
    */
   moveToElement(locator, xOffset = 0, yOffset = 0) {
-    $(locator).moveTo({ xOffset, yOffset });
+    $(locator).moveTo({xOffset, yOffset});
   }
 
   /**
@@ -507,12 +580,12 @@ class Driver {
 
   scrollLoadPage() {
     while (browser.execute("if((window.innerHeight+window.scrollY)>=document.body.offsetHeight){return true;}") !== true) {
-      browser.execute(`window.scrollTo({top: document.body.scrollHeight,left: 0,behavior: 'smooth'});`);
+      browser.execute("window.scrollTo({top: document.body.scrollHeight,left: 0,behavior: 'smooth'});");
       this.waitForAjax();
       browser.pause(500);
     }
     while (browser.execute(`if((window.innerHeight+window.scrollY)<=${browser.getWindowSize().height}){return true;}`) !== true) {
-      browser.execute(`window.scrollTo({top: 0,left: 0,behavior: 'smooth'});`);
+      browser.execute("window.scrollTo({top: 0,left: 0,behavior: 'smooth'});");
       this.waitForAjax();
       browser.pause(500);
     }
@@ -527,7 +600,7 @@ class Driver {
    * @param title {string} Title expected on the page.
    */
   shouldHavePageTitle(title) {
-    expect(browser).toHaveTitle(title, { wait: Constants.getShortWait() });
+    expect(browser).toHaveTitle(title, {wait: Constants.getShortWait()});
   }
 
   /**
@@ -536,11 +609,11 @@ class Driver {
    */
   waitForElementNotToExist(locator) {
     try {
-      $(locator).waitForExist({ timeout: Constants.getShortWait() }); // Wait for element to exist
+      $(locator).waitForExist({timeout: Constants.getShortWait()}); // Wait for element to exist
     } catch (error) {
       return true;
     } finally {
-      expect($(locator)).not.toExist({ wait: Constants.getMediumWait() });
+      expect($(locator)).not.toExist({wait: Constants.getMediumWait()});
     }
   }
 
@@ -550,11 +623,11 @@ class Driver {
    */
   waitForElementNotToBeVisible(locator) {
     try {
-      $(locator).waitForDisplayed({ timeout: Constants.getShortWait() }); // Wait for element to be visible
+      $(locator).waitForDisplayed({timeout: Constants.getShortWait()}); // Wait for element to be visible
     } catch (error) {
       return true;
     } finally {
-      expect($(locator)).not.toBeVisible({ wait: Constants.getMediumWait() });
+      expect($(locator)).not.toBeVisible({wait: Constants.getMediumWait()});
     }
   }
 
@@ -572,7 +645,7 @@ class Driver {
    * @param locator {string} Locator of element to check is displayed.
    */
   shouldSeeElement(locator) {
-    expect($(locator)).toBeDisplayed({ wait: Constants.getLongWait() });
+    expect($(locator)).toBeDisplayed({wait: Constants.getLongWait()});
   }
 
   /**
@@ -581,7 +654,7 @@ class Driver {
    * @param count {number} Expected Count.
    */
   shouldSeeCountOfElements(locator, count) {
-    expect($(locator).$$(locator)).toBeElementsArrayOfSize(count, { wait: Constants.getLongWait() });
+    expect($(locator).$$(locator)).toBeElementsArrayOfSize(count, {wait: Constants.getLongWait()});
   }
 
   /**
@@ -589,7 +662,7 @@ class Driver {
    * @param locator {string} Locator of element to exist.
    */
   shouldNotSeeElement(locator) {
-    expect($(locator)).not.toBeDisplayed({ wait: Constants.getMediumWait() });
+    expect($(locator)).not.toBeDisplayed({wait: Constants.getMediumWait()});
   }
 
   /**
@@ -598,8 +671,8 @@ class Driver {
    * @param text {string} Expected text from element.
    */
   shouldSeeElementWithTextContent(locator, text) {
-    $(locator).waitForDisplayed();
-    expect($(locator).$$(locator)).toHaveTextContaining(text, { wait: Constants.getMediumWait() });
+    this.shouldSeeElement(locator);
+    expect($(locator).$$(locator)).toHaveTextContaining(text, {wait: Constants.getMediumWait()});
   }
 
   /**
@@ -608,11 +681,12 @@ class Driver {
    * @param text {string} Expected text from elements.
    */
   shouldSeeAllElementsWithTextContent(locator, text) {
-    $(locator).waitForDisplayed();
+    this.shouldSeeElement(locator);
     $(locator).$$(locator).map(element => {
+      element.scrollIntoView();
       if (!element.getText().includes(text)) {
-        element.scrollIntoView();
-        expect(element).toHaveTextContaining(text, { wait: Constants.getMediumWait() });
+        // element.scrollIntoView();
+        expect(element).toHaveTextContaining(text, {wait: Constants.getMediumWait()});
       }
     });
   }
@@ -623,8 +697,8 @@ class Driver {
    * @param value {string} Expected value from element.
    */
   shouldSeeElementWithValue(locator, value) {
-    $(locator).waitForExist();
-    expect($(locator)).toHaveValueContaining(value, { wait: Constants.getMediumWait() });
+    this.shouldSeeElement(locator);
+    expect($(locator)).toHaveValueContaining(value, {wait: Constants.getMediumWait()});
   }
 
   /**

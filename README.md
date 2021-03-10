@@ -2,9 +2,9 @@ NodeJS-CucumberWDIOV6
 ======
 
 A WebDriverIO project that supports web and mobile app test automation. The framework implements a hybrid,
- keyword-driven page component pattern, which makes adding locators as simple as placing two strings in a 
- JSON file and filling in a Cucumber step.
-## Tech Stack 
+keyword-driven page component pattern, which makes adding locators as simple as placing two strings in a
+JSON file and filling in a Cucumber step.
+## Tech Stack
 
 * Javascript (ES6)
 * NodeJS
@@ -25,22 +25,22 @@ Git Clone Project
 ---
 
 ##### You will need to download and install Git
-- [Install Git For Windows Here](https://git-scm.com/download/win) 
-    - Use default options or as preferred.
+- [Install Git For Windows Here](https://git-scm.com/download/win)
+  - Use default options or as preferred.
 1. When on the projects github page click on `clone or download button`(_green button below contributor_) and copy the `HTTP` url
-    - if you are having trouble finding it then copy this url and replace the `placeholderUsername` with your own
-        - `https://github.com/placeholderUsername/placeholder.git`
-2. Open your CLI(command line interface) and `cd`(change directory) into the `directory/folder` where you want to download this project (It is recommended to create a directory for your git projects). 
-    - Ex: `cd git-projects`
+  - if you are having trouble finding it then copy this url and replace the `placeholderUsername` with your own
+    - `https://github.com/placeholderUsername/placeholder.git`
+2. Open your CLI(command line interface) and `cd`(change directory) into the `directory/folder` where you want to download this project (It is recommended to create a directory for your git projects).
+  - Ex: `cd git-projects`
 3. Use git clone to download the project with the following command with your username
-    - `git clone https://github.com/placeholderUsername/placeholder.git`
+  - `git clone https://github.com/placeholderUsername/placeholder.git`
 
 Setup
 ---
 
 #### **VSCODE:**
 * VScode is the recommended IDE/Text Editor for this project.
-* Use any VScode Extensions. Some recommended Extensions for the Framework are: 
+* Use any VScode Extensions. Some recommended Extensions for the Framework are:
 * Cucumber(Gherkin) Full Support: https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete
 * Gherkin step autocomplete: https://marketplace.visualstudio.com/items?itemName=silverbulleters.gherkin-autocomplete
 * ESLint: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
@@ -53,14 +53,14 @@ Add the following tools to your environment:
 * NodeJS
 * 1. Install node.js from: https://nodejs.org/en/download/
 * 2. Choose LTS or CURRENT to Download.
-* 3a. LTS - Install all the required tools and configurations using Microsoft's windows-build-tools using: `npm install --global production windows-build-tools` from an elevated         PowerShell or CMD.exe (run as Administrator). 
+* 3a. LTS - Install all the required tools and configurations using Microsoft's windows-build-tools using: `npm install --global production windows-build-tools` from an elevated         PowerShell or CMD.exe (run as Administrator).
 * 3b. CURRENT - Current build of NodeJS will automatically launch and execute `npm install --global production windows-build-tools`
 * Android Studio (optional)
 * 1. If running local android emulators, install Android Studio: https://developer.android.com/studio/
 * 2. Create an Android Emulator following: https://developer.android.com/studio/run/managing-avds
 * Chrome Dev Tools (optional) - Necessary to inspect elements for UI selectors.
 
-Once your tools are configured, download the project and navigate to the root directory. 
+Once your tools are configured, download the project and navigate to the root directory.
 
 * Run: `npm install`
 * If everything built successfully, you're ready to run tests.

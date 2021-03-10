@@ -1,21 +1,21 @@
-import { When } from "cucumber";
+import {When} from "cucumber";
 import Driver from "../../../src/utility/driver";
 import Utility from "../../../src/utility/utility";
 
-When(/^I enter "(.*?)" into the "(.*?)"$/, (value, elementName) => {
+When(/^I enter "(.*?)" into the "(.*?)" on the page$/, (value, elementName) => {
   const locator = Utility.getLocator(elementName);
   switch (value) {
-    case "LOCALUSER":
-      value = process.env.LOCALUSER;
-      break;
-    case "LOCALEMAIL":
-      value = process.env.LOCALEMAIL;
-      break;
-    case "LOCALPASS":
-      value = process.env.LOCALPASS;
-      break;
-    default:
-      break;
+  case "LOCALUSER":
+    value = process.env.LOCALUSER;
+    break;
+  case "LOCALEMAIL":
+    value = process.env.LOCALEMAIL;
+    break;
+  case "LOCALPASS":
+    value = process.env.LOCALPASS;
+    break;
+  default:
+    break;
   }
   Driver.fillElementWithText(locator, value);
 });
@@ -34,7 +34,7 @@ When(/^I enter todays date into the "(.*?)"$/, (elementName) => {
   Driver.addValueToElement(locator, `\uE011${date}`); // "\uE011" is HOME key
 });
 
-When(/^I delete text from the "(.*?)" input$/, (elementName) => {
+When(/^I delete text from the "(.*?)" input on the page$/, (elementName) => {
   const locator = Utility.getLocator(elementName);
   Driver.deleteElementText(locator);
 });

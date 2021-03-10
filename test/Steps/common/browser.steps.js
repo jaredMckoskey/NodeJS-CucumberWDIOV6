@@ -1,21 +1,20 @@
-import { Given, When, Then } from "cucumber";
+import {Given, When, Then} from "cucumber";
 import Constants from "../../../src/utility/constants";
 import Driver from "../../../src/utility/driver";
 import Utility from "../../../src/utility/utility";
+import Request from "../../../src/api/request";
 import Chalk from "chalk";
+
+// Temporary until Hamburger Implementation
+const logo = Utility.getLocatorInContext("BEST_BUY_LOGO", "header");
 
 Given(/^I go to the "(.*?)" page$/, pageName => {
   global.pageContext = Utility.toCamelCase(pageName);
   const url = Utility.getLocator("URL");
   Driver.loadUrl(`https://www.${Constants.getBaseUrl()}${url}`);
-  Driver.waitForURL(Constants.getBaseUrl() + url);
-  Driver.waitForPageLoad();
-});
-
-Then(/^I am on the "(.*?)" page$/, pageName => {
-  global.pageContext = Utility.toCamelCase(pageName);
-  const url = Utility.getLocator("URL");
-  Driver.waitForURL(Constants.getBaseUrl() + url);
+  Driver.waitForURL(`https://www.${Constants.getBaseUrl()}${url}`);
+  Driver.waitForAjax();
+  Driver.wait(1);
 });
 
 When(/^I accept the alert$/, () => {
@@ -45,4 +44,8 @@ When(/^I inject the "(.*?)" environment cookie into the environment$/, (cookieNa
 
 When(/^I execute "(.*?)" script into the environment$/, (script) => {
   Driver.executeScript(script);
+});
+
+When(/^I execute "(.*?)" script into the environment and log the return value$/, (script) => {
+  Driver.getScriptReturnAndLog(script);
 });

@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 
+const wdioParallel = require("wdio-cucumber-parallel-execution");
 const allureReporter = require("./src/utility/customAllure");
 const capability = require("./capabilities.json")[process.env.CAPABILITY];
 const chai = require("chai");
@@ -8,28 +11,46 @@ const glob = require("glob");
 const fs = require("fs");
 const chalk = require("chalk");
 const path = require("path");
-const featuresPath = "./test/Product/features/**/*.feature";
+let featuresPath = "./test/Features/**/*.feature";
 let filesWithTags = "";
 let build = "";
-let tags = [];
+let tags = process.env.TAG.replace(/\|\|/g, "or").replace(/&&/g, "and").replace(/!@/g, "not @");
+let scenarioTags;
+
+// deleteFolderRecursive("./test/Parallel");
+
+if (+process.env.PARALLEL > 1) {
+  let fullFeaturesPath;
+  if (process.env.TOOL === "enabled") fullFeaturesPath = "./test/Features/tools";
+  else fullFeaturesPath = `./test/Features/${process.env.VIEW}`;
+
+  wdioParallel.performSetup({
+    sourceSpecDirectory: fullFeaturesPath,
+    tmpSpecDirectory: "./test/Parallel",
+    tagExpression: `${tags} and @${process.env.VIEW} and not @wip`,
+    // cleanTmpSpecDirectory: true
+  });
+  featuresPath = "./test/Parallel/**/*.feature";
+  filesWithTags = "./test/Parallel/**/*.feature";
+}
 
 // Filter out feature files that don't have specified tags, this prevents unnecessary loading of browser driver
 if (process.env.TAG && process.env.TAG !== "" && process.env.TAG !== "@All") {
   const expressionNode = process.env.TAG.match(/(@\w+)/g) || [];
   filesWithTags = glob.sync(featuresPath).map((file) => {
     const content = fs.readFileSync(file, "utf8");
-    let found = false;
+    let match = 0;
     if (content.length > 0) {
-      const tagsInFile = content.match(/(@\w+)/g) || [];
+      const tagsInFile = [...new Set(content.match(/(@\w+)/g))] || [];
       tagsInFile.forEach(t => {
         expressionNode.forEach(e => {
           if (e === t) {
-            found = true;
+            match++;
           }
         });
       });
     }
-    if (found) {
+    if (match > (tags.match(/and/g) || []).length - (tags.match(/not/g) || []).length) {
       return file;
     } else {
       return null;
@@ -55,7 +76,7 @@ let configuration = {
     blockOutStatusBar: true,
     blockOutToolBar: true,
     disableCSSAnimation: true
-  }]],
+  }], ["shared-store"]],
   sync: true,
   logLevel: "silent",
   logToStdout: true,
@@ -64,7 +85,7 @@ let configuration = {
   screenshotPath: "./results/screenshots/",
   screenshotOnReject: true,
   waitforTimeout: 90000,
-  connectionRetryTimeout: 90000,
+  connectionRetryTimeout: 300000,
   connectionRetryCount: 3,
   specFileRetries: 0,
   framework: "cucumber",
@@ -81,34 +102,38 @@ let configuration = {
     source: true,
     profile: [],
     strict: true,
-    tagExpression: `${process.env.TAG} and @${process.env.VIEW} and not @wip`,
-    tagsInTitle: false,
+    tagsInTitle: true,
+    tags: [],
+    tagExpression: `${tags} and @${process.env.VIEW} and not @wip`,
+    retry: +process.env.RETRY,
     timeout: 300000,
-    tags: []
+    dryRun: process.env.DRYRUN !== "disabled"
   },
   reporters: [
     ["allure", {
-      outputDir: "./allure-results",
+      outputDir: "./allure/allure-results",
       disableWebdriverStepsReporting: true,
       disableWebdriverScreenshotsReporting: true,
       useCucumberStepReporter: true,
-      enableScreenshotDiffPlugin: true
+      enableScreenshotDiffPlugin: true,
     }]
   ],
 
   // WebDriverIO specific hooks
   onPrepare: function (config, capabilities) {
     // Cleanup existing screenshots from previous runs
-    let Results = path.resolve("./results");
-    let allureResults = path.resolve("./allure-results");
-    let actualImages = path.resolve("./imageComparison/actual");
-    let diffImages = path.resolve("./imageComparison/diff");
     let tempDownloadsPath = path.resolve("./results/tempDownloads/");
-    deleteFolderRecursive(Results);
-    deleteFolderRecursive(allureResults);
-    deleteFolderRecursive(actualImages);
-    deleteFolderRecursive(diffImages);
     mkDirByPathSync(tempDownloadsPath);
+    if (process.env.DRIVER === "local") {
+      let Results = path.resolve("./results");
+      let allureResults = path.resolve("./allure");
+      let actualImages = path.resolve("./imageComparison/actual");
+      let diffImages = path.resolve("./imageComparison/diff");
+      deleteFolderRecursive(Results);
+      deleteFolderRecursive(allureResults);
+      deleteFolderRecursive(actualImages);
+      deleteFolderRecursive(diffImages);
+    }
     // Deals with All tag
     if (process.env.TAG === "@All") {
       process.env.TAG = "";
@@ -133,7 +158,7 @@ let configuration = {
   },
   beforeHook: function (test, context/*, stepData, world*/) {
   },
-  afterHook: function (test, context, { error, result, duration, passed, retries }/*, stepData, world*/) {
+  afterHook: function (test, context, {error, result, duration, passed, retries}/*, stepData, world*/) {
   },
   beforeTest: function (test, context) {
   },
@@ -141,7 +166,7 @@ let configuration = {
   },
   afterCommand: function (commandName, args, result, error) {
   },
-  afterTest: function (test, context, { error, result, duration, passed, retries }) {
+  afterTest: function (test, context, {error, result, duration, passed, retries}) {
   },
   afterSuite: function (suite) {
   },
@@ -152,11 +177,12 @@ let configuration = {
   onComplete: function (exitCode, config, capabilities, results) {
     // Execute Shell Script to copy Allure History, then generate new Allure Report
     if (process.env.DRIVER === "local") {
-      shell.cp("-r", "allure-report/history", "./allure-results");
-      shell.exec("npx allure generate ./allure-results --clean");
+      shell.cp("-r", "allure-report/history", "./allure/allure-results");
+      shell.exec("npx allure generate ./allure/allure-results --clean");
+      deleteFolderRecursive("./test/Parallel");
     }
   },
-  onReload: function(oldSessionId, newSessionId) {
+  onReload: function (oldSessionId, newSessionId) {
   },
 
   // Cucumber specific hooks
@@ -171,14 +197,14 @@ let configuration = {
     }
   },
   beforeScenario: function (uri, feature, scenario, sourceLocation) {
-    tags = scenario.tags.map(tagObject => tagObject.name);
+    scenarioTags = scenario.tags.map(tagObject => tagObject.name);
 
-    if (tags.includes("@accessibility")) global.accessibilityErrors = 0;
+    if (scenarioTags.includes("@accessibility")) global.accessibilityErrors = 0;
 
     if (build !== "") allureReporter.addBuild(build);
 
-    if (browser.capabilities.browserName.toLowerCase() !== "safari") browser.deleteAllCookies();
-    else deleteAllSafariCookies();
+    if (this.maxInstances === 1 && browser.capabilities.browserName.toLowerCase() !== "safari") browser.deleteAllCookies();
+    else if (this.maxInstances === 1 && browser.capabilities.browserName.toLowerCase() === "safari") deleteAllSafariCookies();
 
     if (process.env.DRIVER === "local" && process.env.VIEW === "LV" && !isMobile()) {
       browser.setWindowSize(1600, 900);
@@ -187,16 +213,16 @@ let configuration = {
     }
 
     if (this.maxInstances === 1 && process.env.JENKINS === "disabled") {
-      process.stdout.write(chalk.magenta("  Scenario: " + scenario.name) + "\n");
+      process.stdout.write(chalk.magenta(`  Scenario: ${scenario.name} - ${scenarioTags[0]}`) + "\n");
     }
   },
-  beforeStep: function ({ uri, feature, step }, context) {
-    if (tags.includes("@animations")) waitForAnimations();
+  beforeStep: function ({uri, feature, step}, context) {
+    if (scenarioTags.includes("@animations")) waitForAnimations();
     if (this.maxInstances === 1 && process.env.JENKINS === "disabled") {
       process.stdout.write("    " + chalk.green(step.step.keyword + step.step.text) + "\n");
     }
   },
-  afterStep: function ({ uri, feature, step }, context, { error, result, duration, passed }) {
+  afterStep: function ({uri, feature, step}, context, {error, result, duration, passed}) {
     // Check if DEMOTIME is set. Wait in seconds for DEMOTIME after every step.
     if (process.env.DEMOTIME > 0 && process.env.JENKINS === "disabled") browser.pause(process.env.DEMOTIME * 1000);
 
@@ -209,6 +235,8 @@ let configuration = {
     }
   },
   afterScenario: function (uri, feature, scenario, result, sourceLocation) {
+    scenarioTags = scenario.tags.map(tagObject => tagObject.name);
+
     if (this.maxInstances === 1 && process.env.JENKINS === "disabled") process.stdout.write("\n");
   },
   afterFeature: function (uri, feature, scenarios) {
@@ -218,11 +246,14 @@ let configuration = {
     if (process.env.DRIVER === "remote" && this.maxInstances === 1 && process.env.JENKINS === "disabled") {
       process.stdout.write(`Check out the Full Test Run at https://app.saucelabs.com/tests/${browser.sessionId}\n`);
     }
+    if (+process.env.PARALLEL > 1) {
+      deleteFolderRecursive(uri);
+    }
   }
 };
 
 if (process.env.DRIVER === "remote") {
-  configuration.services.push(["sauce", { region: "us" }]);
+  configuration.services.push(["sauce", {region: "us", setJobNameInBeforeSuite: true}]);
   configuration.user = process.env.SAUCEUSER;
   configuration.key = process.env.SAUCEKEY;
 } else if (process.env.CAPABILITY === "androidEmulatorLocal" || process.env.CAPABILITY === "iPadSimulatorLocal") {
@@ -238,7 +269,11 @@ if (configuration.maxInstances > 1 || process.env.JENKINS === "enabled")
       outputDir: "./results/spec",
       stdout: true
     }]);
-if (process.env.JENKINS === "enabled" && !process.env.TAG.includes("@accessibility")) configuration.specFileRetries = 1;
+
+if (process.env.JENKINS === "enabled" && process.env.TOOL === "disabled") {
+  if (configuration.maxInstances > 1) configuration.specFileRetries = 1;
+  else configuration.cucumberOpts.retry = 1;
+}
 
 function getCapability() {
 
@@ -297,7 +332,7 @@ function getCapability() {
 
 function deleteAllSafariCookies() {
   let cookies = browser.getAllCookies();
-  browser.url("");
+  browser.url("www.google.com");
   cookies.forEach(cookie => {
     browser.deleteCookie(cookie["name"]);
   });
@@ -338,20 +373,26 @@ function isMobile() {
 
 function takeScreenshot(scenarioName) {
   let scrollLocked = browser.findElements("xpath", "//*[contains(@class,'scroll-locked')]").length > 0;
+  let hideElementsArray = [];
+  let hideElementsAfterFirstScrollArray = [];
+  hideElementsArray.concat($(require("./src/locators/globalHomePage.json")["screenshot_hide_elements"]["HIDE_SCROLL_TO_TOP_BUTTON"]));
+  hideElementsArray.concat($(require("./src/locators/recentlyViewedPage.json")["screenshot_hide_elements"]["HIDE_HELP_CHAT_BUTTON"]));
+  hideElementsAfterFirstScrollArray.concat($(require("./src/locators/header.json")["screenshot_hide_elements_after_first_scroll"]["HIDE_HEADER"]));
+
   let shotPath = browser.config.screenshotPath
     .split(":")[0]
     .replace(/ /g, "");
   let fileName = scenarioName.replace(/ /g, "_") + "-" + process.env.CAPABILITY + "-" + Date.now();
-  if (scrollLocked) {
+  if (scrollLocked || process.env.DRIVER === "local") {
     browser.saveScreen(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
-      // hideElements: hideElementsArray
+      hideElements: hideElementsArray
     });
   } else {
     browser.saveFullPageScreen(`${fileName}`, {
       actualFolder: path.join(process.cwd(), shotPath),
-      // hideElements: hideElementsArray,
-      // hideAfterFirstScroll: hideElementsAfterFirstScrollArray
+      hideElements: hideElementsArray,
+      hideAfterFirstScroll: hideElementsAfterFirstScrollArray
     });
   }
   allureReporter.addScreenshot(`${shotPath}${fileName}.png`);
@@ -360,7 +401,6 @@ function takeScreenshot(scenarioName) {
 function mkDirByPathSync(targetDir, {isRelativeToScript = false} = {}) {
   const sep = path.sep;
   const initDir = path.isAbsolute(targetDir) ? sep : "";
-  // eslint-disable-next-line no-undef
   const baseDir = isRelativeToScript ? __dirname : ".";
 
   targetDir.split(sep).reduce((parentDir, childDir) => {
