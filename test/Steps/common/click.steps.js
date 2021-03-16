@@ -7,6 +7,11 @@ When(/^I click the "(.*?)" on the page$/, (elementName) => {
   Driver.clickElement(locator);
 });
 
+When(/^I click the "(.*?)" with "(.*?)" text on the page$/, (elementName, text) => {
+  const locator = Utility.getLocator(elementName);
+  Driver.clickElementWithText(locator, text);
+});
+
 When(/^I click the first of the "(.*?)" on the page$/, (elementName) => {
   const locator = Utility.getLocator(elementName);
   Driver.clickElementIndex(locator, 0);

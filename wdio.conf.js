@@ -375,9 +375,6 @@ function takeScreenshot(scenarioName) {
   let scrollLocked = browser.findElements("xpath", "//*[contains(@class,'scroll-locked')]").length > 0;
   let hideElementsArray = [];
   let hideElementsAfterFirstScrollArray = [];
-  hideElementsArray.concat($(require("./src/locators/globalHomePage.json")["screenshot_hide_elements"]["HIDE_SCROLL_TO_TOP_BUTTON"]));
-  hideElementsArray.concat($(require("./src/locators/recentlyViewedPage.json")["screenshot_hide_elements"]["HIDE_HELP_CHAT_BUTTON"]));
-  hideElementsAfterFirstScrollArray.concat($(require("./src/locators/header.json")["screenshot_hide_elements_after_first_scroll"]["HIDE_HEADER"]));
 
   let shotPath = browser.config.screenshotPath
     .split(":")[0]

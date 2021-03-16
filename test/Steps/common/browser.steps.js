@@ -5,16 +5,17 @@ import Utility from "../../../src/utility/utility";
 import Request from "../../../src/api/request";
 import Chalk from "chalk";
 
-// Temporary until Hamburger Implementation
-const logo = Utility.getLocatorInContext("BEST_BUY_LOGO", "header");
-
 Given(/^I go to the "(.*?)" page$/, pageName => {
   global.pageContext = Utility.toCamelCase(pageName);
   const url = Utility.getLocator("URL");
-  Driver.loadUrl(`https://www.${Constants.getBaseUrl()}${url}`);
-  Driver.waitForURL(`https://www.${Constants.getBaseUrl()}${url}`);
+  Driver.loadUrl(url);
+  // Driver.waitForURL(`https://www.${Constants.getBaseUrl()}${url}`);
   Driver.waitForAjax();
   Driver.wait(1);
+});
+
+Then(/^I am on the "(.*?)" page$/, pageName => {
+  global.pageContext = Utility.toCamelCase(pageName);
 });
 
 When(/^I accept the alert$/, () => {

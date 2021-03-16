@@ -9,5 +9,5 @@ Feature: tap|QA Navigation Demo Tests
     And I take a screenshot
     And I click the "TAP_QA_LINK" on the page
     Then I am on the "tap QA Home Page" page
-    And I click the "ABOUT_BUTTON" on the page
+    When I click the "ABOUT_BUTTON" on the page
     Then I am on the "About Us Page" page

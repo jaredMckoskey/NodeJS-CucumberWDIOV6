@@ -21,6 +21,7 @@
     "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-export-default-from": "^7.12.1",
     "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.13.8",
     "@types/cucumber": "^6.0.1",
     "@wdio/allure-reporter": "^6.11.0",
     "@wdio/appium-service": "^6.12.1",
