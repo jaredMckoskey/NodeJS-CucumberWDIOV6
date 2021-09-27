@@ -5,7 +5,7 @@ import Utility from "../../../src/utility/utility";
 import Request from "../../../src/api/request";
 import Chalk from "chalk";
 
-Given(/^I go to the "(.*?)" page$/, pageName => {
+Given(/^I go to the "(.*?)" page$/, (pageName) => {
   global.pageContext = Utility.toCamelCase(pageName);
   const url = Utility.getLocator("URL");
   Driver.loadUrl(url);
@@ -14,7 +14,7 @@ Given(/^I go to the "(.*?)" page$/, pageName => {
   Driver.wait(1);
 });
 
-Then(/^I am on the "(.*?)" page$/, pageName => {
+Then(/^I am on the "(.*?)" page$/, (pageName) => {
   global.pageContext = Utility.toCamelCase(pageName);
 });
 

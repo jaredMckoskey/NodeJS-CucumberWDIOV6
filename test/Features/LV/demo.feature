@@ -4,7 +4,7 @@ Feature: Google Demo "Hello World" Tests
   @googleTest @LV
   Scenario Outline: Google Demo Test "<Search>"
     Given I go to the "Google Home Page" page
-    When I enter "<Search>" into the "<Search Input>"
+    When I enter "<Search>" into the "<Search Input>" on the page
 
     Examples:
       | Search                                  | Search Input |
